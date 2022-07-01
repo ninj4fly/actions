@@ -30,7 +30,7 @@ jobs:
         id: build-image
         uses: redhat-actions/buildah-build@v2
         with:
-          image: foo-bar
+          image: actions-test
           tags: latest ${{ github.sha }}
           containerfiles: |
             ./Dockerfile
@@ -38,14 +38,14 @@ jobs:
       # Podman Login action (https://github.com/redhat-actions/podman-login) also be used to log in,
       # in which case 'username' and 'password' can be omitted.
       - name: Push To DockerHub
-        id: push-to-dockerio
+        id: push-to-dockerhub
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ steps.build-image.outputs.image }}
           tags: ${{ steps.build-image.outputs.tags }}
-          registry: docker.io/ninj4fly/actions-test
+          registry: docker.io/ninj4fly
           username: ninj4fly
           password: ${{ secrets.DOCKERHUB_REGISTRY_PASSWORD }}
 
       - name: Print image url
-        run: echo "Image pushed to ${{ steps.push-to-quay.outputs.registry-paths }}"
+        run: echo "Image pushed to ${{ steps.push-to-dockerhub.outputs.registry-paths }}"

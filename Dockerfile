@@ -1,6 +1,23 @@
-FROM registry.access.redhat.com/ubi8-minimal
+FROM registry.access.redhat.com/ubi8/go-toolset AS builder
 
-RUN microdnf install /usr/sbin/ip
+COPY app /app
 
-#CMD exec /bin/bash -c "trap : TERM INT; sleep infinity; wait"
-CMD exec echo "FOO, BAR!"
+USER root
+
+RUN chmod a+w /app
+
+USER 1001
+
+WORKDIR /app
+
+RUN go build main.go
+
+FROM scratch
+
+WORKDIR /
+
+COPY --from=builder /app/main .
+
+EXPOSE 80
+
+ENTRYPOINT ["/main"]
